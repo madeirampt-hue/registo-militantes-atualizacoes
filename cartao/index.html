@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="pt-PT">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#006530">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; media-src 'self' blob:; connect-src 'self'; base-uri 'none'; form-action 'none'">
+<title>Cartão de Militante</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="favicon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<!--
+  Cartão de militante digital (MPT — Partido da Terra).
+  O cartão chega por e-mail num link: os dados vão a seguir ao «#» e nunca são enviados para nenhum servidor;
+  ficam só neste telemóvel. O modo «Registo de presenças» lê os códigos QR e guarda apenas o código e a hora
+  (sem nomes nem dados pessoais); a lista é depois importada na aplicação Registo de Militantes, no PC.
+-->
+<style>
+@font-face{font-family:Manrope;font-style:normal;font-display:swap;font-weight:200 800;src:url(fonts/manrope-latin-wght-normal.woff2) format('woff2-variations');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+20AC,U+2122,U+2212,U+FEFF,U+FFFD}
+@font-face{font-family:Manrope;font-style:normal;font-display:swap;font-weight:200 800;src:url(fonts/manrope-latin-ext-wght-normal.woff2) format('woff2-variations');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+1E00-1E9F,U+20A0-20AB,U+20AD-20C0}
+:root{--brand:#006530;--g-50:#F2FAE6;--g-100:#E1F4C7;--g-200:#C8E89A;--g-300:#A8D767;--g-700:#45711F;--g-800:#34561A;--g-950:#11200A;
+  --bg:#F6F8F5;--surface:#fff;--ink:#16201A;--muted:#6A7464;--line:#D9E0D5;--ok:#2E7D32;--ok-2:#E8F5E9;--warn:#B45309;--warn-2:#FEF3E2;--bad:#B42318;--bad-2:#FDECEA;color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0E150F;--surface:#151F16;--ink:#E6EFE2;--muted:#9AA894;--line:#2A3A2B;--ok:#6FCF73;--ok-2:#15301A;--warn:#F59E0B;--warn-2:#2E2210;--bad:#F87171;--bad-2:#331817;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0E150F;--surface:#151F16;--ink:#E6EFE2;--muted:#9AA894;--line:#2A3A2B;--ok:#6FCF73;--ok-2:#15301A;--warn:#F59E0B;--warn-2:#2E2210;--bad:#F87171;--bad-2:#331817;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 Manrope,"Segoe UI",system-ui,sans-serif;-webkit-tap-highlight-color:transparent}
+body{min-height:100vh;padding:max(16px,env(safe-area-inset-top)) 16px max(24px,env(safe-area-inset-bottom))}
+.wrap{max-width:460px;margin:0 auto}
+header{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+header img{width:34px;height:34px;border-radius:9px;background:#fff;padding:3px}
+header b{font-size:16px;flex:1}
+.ico{all:unset;cursor:pointer;width:38px;height:38px;display:grid;place-items:center;border-radius:12px;color:var(--ink)}
+.ico:focus-visible,.btn:focus-visible{outline:3px solid var(--g-300);outline-offset:2px}
+.ico svg{width:22px;height:22px}
+/* cartão */
+.cartao{position:relative;border-radius:20px;overflow:hidden;background:#fff;color:#16201A;box-shadow:0 18px 44px rgba(17,32,10,.18);aspect-ratio:85.6/54;container-type:inline-size}
+.c-top{height:23.5%;background:linear-gradient(100deg,#006530,#34561A);display:flex;align-items:center;gap:3.2cqw;padding:0 3.6cqw;color:#fff;position:relative;overflow:hidden}
+.c-top:after{content:"";position:absolute;right:-6cqw;top:-14cqw;width:32cqw;height:32cqw;border-radius:50%;background:rgba(168,215,103,.22)}
+.c-logo{width:9.6cqw;height:9.6cqw;border-radius:2cqw;background:#fff;display:grid;place-items:center;flex:0 0 auto}
+.c-logo img{width:82%;height:82%;object-fit:contain}
+.c-partido{font-weight:800;font-size:3.9cqw;line-height:1.05}
+.c-sub{font-weight:700;font-size:2.05cqw;letter-spacing:.5cqw;opacity:.85;margin-top:.6cqw}
+.c-corpo{display:flex;gap:3.2cqw;padding:3.4cqw 3.6cqw 0}
+.c-foto{width:25.5cqw;height:34cqw;border-radius:2.2cqw;object-fit:cover;border:.3cqw solid #C8E89A;background:#E1F4C7;flex:0 0 auto;display:grid;place-items:center;font-weight:800;font-size:9cqw;color:#45711F}
+.c-dados{flex:1;min-width:0}
+.c-nome{font-weight:800;font-size:3.6cqw;line-height:1.15;margin-bottom:2.2cqw;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.c-rot{font-weight:700;font-size:1.75cqw;letter-spacing:.2cqw;color:#6A7464;text-transform:uppercase}
+.c-num{font-weight:800;font-size:4.9cqw;color:#006530;line-height:1.1;margin-bottom:1.8cqw}
+.c-lin{display:flex;gap:4cqw;margin-bottom:1.6cqw}
+.c-val{font-weight:700;font-size:2.7cqw}
+.c-est{font-weight:500;font-size:2.3cqw;color:#3A4236;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.c-qr{width:21cqw;flex:0 0 auto;text-align:center}
+.c-qr svg{width:21cqw;height:21cqw;background:#fff;border-radius:1.4cqw;border:.2cqw solid #D9E0D5;padding:.6cqw}
+.c-cod{font-weight:700;font-size:2.1cqw;margin-top:.6cqw;font-family:ui-monospace,Menlo,Consolas,monospace}
+.c-rod{position:absolute;left:0;right:0;bottom:0;height:8.2%;background:#006530;color:rgba(255,255,255,.92);font-size:1.75cqw;font-weight:600;display:flex;align-items:center;justify-content:space-between;padding:0 3.6cqw}
+.c-rod b{color:#A8D767;font-size:2cqw}
+/* estado */
+.estado{display:flex;align-items:center;gap:10px;margin:16px 0;padding:12px 14px;border-radius:14px;font-weight:700}
+.estado.ok{background:var(--ok-2);color:var(--ok)}.estado.warn{background:var(--warn-2);color:var(--warn)}.estado.bad{background:var(--bad-2);color:var(--bad)}
+.estado small{display:block;font-weight:500;opacity:.9}
+.btn{all:unset;box-sizing:border-box;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:52px;padding:12px 16px;border-radius:14px;font-weight:700;background:var(--surface);border:1px solid var(--line);color:var(--ink);text-align:center}
+.btn.pri{background:#006530;border-color:#006530;color:#fff}
+.btn.perigo{color:var(--bad)}
+.btn svg{width:20px;height:20px;flex:0 0 auto}
+.pilha{display:grid;gap:10px;margin-top:12px}
+.dica{font-size:13px;color:var(--muted);margin:12px 2px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px;margin-top:12px}
+h1{font-size:22px;margin:4px 0 6px}h2{font-size:17px;margin:0 0 8px}
+label{display:block;font-weight:700;font-size:13px;margin:10px 0 4px}
+input{width:100%;font:inherit;padding:12px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+/* QR em grande */
+#grande{position:fixed;inset:0;background:#fff;display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;z-index:20;color:#16201A;padding:20px}
+#grande.on{display:flex}
+#grande svg{width:min(80vw,80vh);height:min(80vw,80vh)}
+#grande b{font-size:20px}#grande span{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:18px}
+/* leitor */
+.cam{position:relative;border-radius:18px;overflow:hidden;background:#000;aspect-ratio:1;margin-top:12px}
+.cam video{width:100%;height:100%;object-fit:cover}
+.cam:after{content:"";position:absolute;inset:18%;border:3px solid rgba(255,255,255,.85);border-radius:18px;box-shadow:0 0 0 999px rgba(0,0,0,.25)}
+.flash{position:absolute;inset:0;background:rgba(46,125,50,.55);opacity:0;transition:opacity .25s;z-index:2;display:grid;place-items:center;color:#fff;font-weight:800;font-size:22px}
+.flash.on{opacity:1}
+.lista{list-style:none;margin:8px 0 0;padding:0;max-height:300px;overflow:auto}
+.lista li{display:flex;justify-content:space-between;gap:10px;padding:9px 2px;border-bottom:1px solid var(--line);font-family:ui-monospace,Menlo,Consolas,monospace;font-size:14px}
+.lista li span{color:var(--muted)}
+.vazio{text-align:center;color:var(--muted);padding:26px 10px}
+.agenda h2{display:flex;align-items:center;gap:8px}
+.ev{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.ev:last-child{border-bottom:0}
+.ev-d{flex:0 0 54px;text-align:center;border-radius:12px;background:#006530;color:#fff;padding:6px 0;line-height:1.1;height:max-content}
+.ev-d b{display:block;font-size:22px}.ev-d small{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.ev-t{flex:1;min-width:0}.ev-t b{display:block}.ev-t small{display:block;color:var(--muted)}
+.ev-t p{margin:6px 0 0;font-size:14px;white-space:pre-wrap}
+.ev-a{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+.ev-a a,.ev-a button{all:unset;cursor:pointer;font-size:13px;font-weight:700;color:var(--g-700);padding:6px 10px;border:1px solid var(--line);border-radius:10px}
+.novo{display:inline-block;font-size:11px;font-weight:800;color:#fff;background:#B45309;border-radius:6px;padding:1px 6px;margin-left:6px;vertical-align:2px}
+.toast{position:fixed;left:50%;bottom:max(20px,env(safe-area-inset-bottom));transform:translateX(-50%);background:#16201A;color:#fff;padding:12px 16px;border-radius:12px;font-weight:600;z-index:30;max-width:90vw;opacity:0;transition:opacity .2s;pointer-events:none}
+.toast.on{opacity:1}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<div id="grande" role="dialog" aria-label="Código QR em grande"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script src="lib/qrcode.js"></script>
+<script>
+'use strict';
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+const ICON = {
+  menu: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>',
+  back: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>',
+  qr: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3M21 14v7h-7M17 21v-4"/></svg>',
+  cam: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>',
+  send: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4z"/></svg>',
+  trash: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>',
+  people: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+  card: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><circle cx="8" cy="11" r="2.5"/><path d="M4.5 17a3.5 3.5 0 0 1 7 0M14 9h5M14 13h5"/></svg>'
+};
+let toastT; const toast = t => { const el = $('#toast'); el.textContent = t; el.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove('on'), 2600); };
+// armazenamento só neste telemóvel (pode falhar em modo privado: a aplicação continua a funcionar)
+const Guardar = {
+  ler(k) { try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch { return null; } },
+  gravar(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch { return false; } },
+  apagar(k) { try { localStorage.removeItem(k); } catch { } }
+};
+const pad = n => String(n).padStart(2, '0');
+const dataPT = s => { const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(s || ''); return m ? `${m[3]}/${m[2]}/${m[1]}` : '—'; };
+const hojeISO = () => { const d = new Date(); return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`; };
+const fmtCod = c => c ? c.slice(0, 4) + '-' + c.slice(4) : '';
+const iniciais = n => { const w = String(n || '').trim().split(/\s+/).filter(Boolean); return ((w[0]?.[0] || '') + (w.length > 1 ? w[w.length - 1][0] : '')).toUpperCase(); };
+function svgQR(texto) {
+  const q = qrcode(0, 'M'); q.addData(texto); q.make(); const n = q.getModuleCount(); let d = '';
+  for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) if (q.isDark(r, c)) d += `M${c} ${r}h1v1h-1z`;
+  return `<svg viewBox="-2 -2 ${n + 4} ${n + 4}" shape-rendering="crispEdges" role="img" aria-label="Código QR do cartão"><rect x="-2" y="-2" width="${n + 4}" height="${n + 4}" fill="#fff"/><path d="${d}" fill="#11200A"/></svg>`;
+}
+// dados do cartão: link «…/cartao/#c=<base64url>» gerado pela aplicação Registo de Militantes
+function lerLink() {
+  const h = location.hash.match(/[#&]c=([A-Za-z0-9_-]+)/); if (!h) return null;
+  try {
+    const b = atob(h[1].replace(/-/g, '+').replace(/_/g, '/')), u = new Uint8Array([...b].map(c => c.charCodeAt(0)));
+    const c = JSON.parse(new TextDecoder().decode(u));
+    if (c.v !== 1 || !/^[A-Z0-9]{8}$/.test(c.cod || '') || !c.nome || !c.num) return null;
+    if (c.foto && !/^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(c.foto)) c.foto = '';
+    c.org = c.org === true;
+    if (c.ak && !/^[A-Za-z0-9+/]{43}=$/.test(c.ak)) delete c.ak;
+    if (c.logo && !/^data:image\/(jpeg|png);base64,[A-Za-z0-9+/=]+$/.test(c.logo)) c.logo = '';
+    return c;
+  } catch { return null; }
+}
+function estado(c) {
+  const v = /^\d{4}-\d{2}-\d{2}$/.test(c.val || '') ? c.val : '', h = hojeISO();
+  if (!v) return { cls: 'warn', t: 'Validade desconhecida' };
+  if (v < h) return { cls: 'bad', t: 'Cartão caducado', s: `Caducou em ${dataPT(v)}. Peça um cartão novo ao partido.` };
+  const dias = Math.round((new Date(v) - new Date(h)) / 86400000);
+  return dias <= 60 ? { cls: 'warn', t: 'Cartão válido', s: `Caduca em ${dataPT(v)} (faltam ${dias} dias).` } : { cls: 'ok', t: 'Cartão válido', s: `Válido até ${dataPT(v)}.` };
+}
+const htmlCartao = c => `<div class="cartao" aria-label="Cartão de militante de ${esc(c.nome)}">
+  <div class="c-top"><div class="c-logo"><img src="${c.logo || 'icon-192.png'}" alt="Símbolo do partido"></div><div><div class="c-partido">${esc(c.partido || 'MPT — Partido da Terra')}</div><div class="c-sub">CARTÃO DE MILITANTE</div></div></div>
+  <div class="c-corpo">${c.foto ? `<img class="c-foto" src="${c.foto}" alt="Fotografia">` : `<div class="c-foto">${esc(iniciais(c.nome))}</div>`}
+    <div class="c-dados"><div class="c-nome">${esc(c.nome)}</div><div class="c-rot">N.º de militante</div><div class="c-num">${esc(c.num)}</div>
+      <div class="c-lin"><div><div class="c-rot">Admissão</div><div class="c-val">${dataPT(c.adm)}</div></div><div><div class="c-rot">Válido até</div><div class="c-val">${dataPT(c.val)}</div></div></div>
+      ${c.est ? `<div class="c-rot">Estrutura</div><div class="c-est">${esc(c.est)}</div>` : ''}</div>
+    <div class="c-qr">${svgQR('MIL1' + c.cod)}<div class="c-cod">${fmtCod(c.cod)}</div></div></div>
+  <div class="c-rod"><span>Cartão pessoal e intransmissível</span><b>${esc(c.sigla || 'MPT')}</b></div></div>`;
+
+/* ---------- Ecrãs ---------- */
+function ecraCartao() {
+  const c = Guardar.ler('cartao');
+  if (!c) return ecraVazio();
+  const e = estado(c);
+  $('#app').innerHTML = `<header><img src="icon-192.png" alt=""><b>O meu cartão</b><button class="ico" id="bMenu" aria-label="Opções">${ICON.menu}</button></header>
+    ${htmlCartao(c)}
+    <div class="estado ${e.cls}"><div>${esc(e.t)}${e.s ? `<small>${esc(e.s)}</small>` : ''}</div></div>
+    <div class="pilha"><button class="btn pri" id="bGrande">${ICON.qr} Mostrar o código para ler</button></div>
+    <p class="dica">Nas reuniões e eventos, mostre o código QR a quem regista as presenças. Funciona sem internet. Cartão ${esc(c.via || 1)}.ª via, emitido em ${dataPT(c.emi)}.</p>
+    <div id="agenda"></div>
+    <div id="menu" class="card hidden"><div class="pilha" style="margin:0">
+      ${c.org ? `<button class="btn" id="bPres">${ICON.people} Registo de presenças (organizador)</button>` : ''}
+      <button class="btn perigo" id="bApagar">${ICON.trash} Retirar o cartão deste telemóvel</button></div></div>`;
+  $('#bMenu').onclick = () => $('#menu').classList.toggle('hidden');
+  abrirAgenda(c);
+  $('#bGrande').onclick = () => qrGrande(c);
+  $('#bPres') && ($('#bPres').onclick = () => ecraPresencas());
+  $('#bApagar').onclick = () => { if (confirm('Retirar o cartão deste telemóvel? Para o voltar a pôr, abra outra vez o link do e-mail.')) { Guardar.apagar('cartao'); ecraCartao(); } };
+}
+function ecraVazio() {
+  $('#app').innerHTML = `<header><img src="icon-192.png" alt=""><b>Cartão de Militante</b></header>
+    <div class="card" style="text-align:center"><div style="color:var(--muted);margin:10px 0">${ICON.card.replace('<svg', '<svg style="width:54px;height:54px"')}</div>
+      <h1>Ainda sem cartão</h1><p style="color:var(--muted)">Abra neste telemóvel o link do e-mail «O seu cartão de militante» que o partido lhe enviou. O cartão fica guardado aqui e funciona sem internet.</p></div>`;
+}
+function ecraNovo(c) {
+  const antigo = Guardar.ler('cartao');
+  $('#app').innerHTML = `<header><img src="icon-192.png" alt=""><b>Novo cartão</b></header>
+    ${htmlCartao(c)}
+    <div class="pilha" style="margin-top:16px"><button class="btn pri" id="bOk">${ICON.card} Guardar o cartão neste telemóvel</button><button class="btn" id="bNao">Agora não</button></div>
+    <p class="dica">${antigo ? `Substitui o cartão que já está guardado (${esc(antigo.num)}, ${esc(antigo.via || 1)}.ª via). ` : ''}${c.org ? 'Este cartão permite registar presenças (organizador). ' : ''}Os dados ficam só neste telemóvel; não são enviados para nenhum servidor. Para ter o cartão sempre à mão, use «Adicionar ao ecrã principal» (Android: menu ⋮ · iPhone: botão Partilhar).</p>`;
+  history.replaceState(null, '', location.pathname + location.search);
+  $('#bOk').onclick = () => { if (!Guardar.gravar('cartao', c)) return toast('Não foi possível guardar (modo privado?).'); toast('Cartão guardado.'); ecraCartao(); };
+  $('#bNao').onclick = () => ecraCartao();
+}
+function qrGrande(c) {
+  const g = $('#grande'); g.innerHTML = `${svgQR('MIL1' + c.cod)}<b>${esc(c.nome)}</b><span>${esc(c.num)} · ${fmtCod(c.cod)}</span><small style="color:#6A7464">Toque para fechar</small>`;
+  g.classList.add('on'); g.onclick = () => g.classList.remove('on');
+  try { navigator.wakeLock?.request('screen').then(l => { g.addEventListener('click', () => l.release().catch(() => { }), { once: true }); }).catch(() => { }); } catch { }
+}
+
+/* ---------- Registo de presenças: só código e hora, sem dados pessoais ---------- */
+let pararCam = null;
+function ecraPresencas() {
+  if (!Guardar.ler('cartao')?.org) return ecraCartao(); // só para organizadores (autorização no cartão enviado pelo partido)
+  const ev = Guardar.ler('evento') || { nome: '', data: hojeISO(), lidos: [] };
+  const lista = () => ev.lidos.length ? `<ul class="lista">${ev.lidos.slice().reverse().map(l => `<li>${fmtCod(l.c)}<span>${l.t.slice(11, 16)}</span></li>`).join('')}</ul>` : '<div class="vazio">Ainda não leu nenhum cartão.</div>';
+  const guardar = () => Guardar.gravar('evento', ev);
+  $('#app').innerHTML = `<header><button class="ico" id="bVoltar" aria-label="Voltar">${ICON.back}</button><b>Registo de presenças</b></header>
+    <div class="card"><label for="evNome" style="margin-top:0">Reunião ou evento</label><input id="evNome" maxlength="80" placeholder="Ex.: Plenário regional" value="${esc(ev.nome)}">
+      <label for="evData">Data</label><input id="evData" type="date" value="${esc(ev.data)}"></div>
+    <div class="cam hidden" id="cam"><video id="vid" playsinline muted></video><div class="flash" id="flash">✔ Registado</div></div>
+    <div class="pilha"><button class="btn pri" id="bCam">${ICON.cam} Ler cartões com a câmara</button></div>
+    <div class="card"><h2>Presenças lidas: <span id="nLidos">${ev.lidos.length}</span></h2><div id="lst">${lista()}</div></div>
+    <div class="pilha"><button class="btn" id="bEnviar" ${ev.lidos.length ? '' : 'disabled'}>${ICON.send} Enviar a lista para o PC</button><button class="btn perigo" id="bLimpar">${ICON.trash} Começar um novo registo</button></div>
+    <p class="dica">Este telemóvel guarda só o código do cartão e a hora, sem nomes. A aplicação Registo de Militantes, no PC, junta os nomes, verifica os cartões e faz a lista de presenças.</p>`;
+  const sair = () => { pararCam?.(); ecraCartao(); };
+  $('#bVoltar').onclick = sair;
+  $('#evNome').oninput = () => { ev.nome = $('#evNome').value.trim(); guardar(); };
+  $('#evData').onchange = () => { ev.data = $('#evData').value; guardar(); };
+  const registar = cod => {
+    if (ev.lidos.some(l => l.c === cod)) { toast(`${fmtCod(cod)} já estava registado.`); return; }
+    const d = new Date(); ev.lidos.push({ c: cod, t: `${hojeISO()}T${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}` }); guardar();
+    $('#nLidos').textContent = ev.lidos.length; $('#lst').innerHTML = lista(); $('#bEnviar').disabled = false;
+    const f = $('#flash'); f.classList.add('on'); setTimeout(() => f.classList.remove('on'), 700); try { navigator.vibrate?.(120); } catch { }
+  };
+  $('#bCam').onclick = async () => {
+    if (pararCam) { pararCam(); return; }
+    if (!navigator.mediaDevices?.getUserMedia) return toast('A câmara não está disponível neste navegador.');
+    let stream; try { stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false }); } catch { return toast('Sem acesso à câmara: autorize-a nas definições do navegador.'); }
+    if (!window.jsQR) await new Promise((ok, ko) => { const s = document.createElement('script'); s.src = 'lib/jsQR.js'; s.onload = ok; s.onerror = ko; document.head.appendChild(s); }).catch(() => { });
+    if (!window.jsQR) { stream.getTracks().forEach(t => t.stop()); return toast('Não foi possível carregar o leitor de QR.'); }
+    const v = $('#vid'), cv = document.createElement('canvas'), cx = cv.getContext('2d', { willReadFrequently: true }); let ativo = true, ultimo = '', quando = 0;
+    v.srcObject = stream; await v.play().catch(() => { }); $('#cam').classList.remove('hidden'); $('#bCam').innerHTML = `${ICON.cam} Parar a câmara`;
+    pararCam = () => { ativo = false; stream.getTracks().forEach(t => t.stop()); $('#cam')?.classList.add('hidden'); if ($('#bCam')) $('#bCam').innerHTML = `${ICON.cam} Ler cartões com a câmara`; pararCam = null; };
+    const passo = () => {
+      if (!ativo) return;
+      if (v.readyState >= 2 && v.videoWidth) {
+        const k = Math.min(1, 640 / v.videoWidth); cv.width = v.videoWidth * k; cv.height = v.videoHeight * k; cx.drawImage(v, 0, 0, cv.width, cv.height);
+        const r = jsQR(cx.getImageData(0, 0, cv.width, cv.height).data, cv.width, cv.height, { inversionAttempts: 'dontInvert' });
+        const m = r && /^MIL1([A-Z0-9]{8})$/.exec(r.data.trim().toUpperCase());
+        if (m && (m[1] !== ultimo || Date.now() - quando > 4000)) { ultimo = m[1]; quando = Date.now(); registar(m[1]); }
+        else if (r && !m && Date.now() - quando > 3000) { quando = Date.now(); toast('Este código não é um cartão de militante.'); }
+      }
+      requestAnimationFrame(passo);
+    };
+    passo();
+  };
+  $('#bEnviar').onclick = async () => {
+    if (!ev.lidos.length) return;
+    const nome = (ev.nome || 'Reunião').replace(/[\r\n;]+/g, ' ').slice(0, 80);
+    const txt = ['PRESENCAS-MIL1', `evento;${nome}`, `data;${ev.data || hojeISO()}`, ...ev.lidos.map(l => `${l.c};${l.t}`)].join('\n') + '\n';
+    const fn = `presencas_${(ev.data || hojeISO())}_${nome.normalize('NFD').replace(/[^\w]+/g, '-').replace(/^-|-$/g, '').slice(0, 40) || 'reuniao'}.txt`;
+    const f = new File([txt], fn, { type: 'text/plain' });
+    try { if (navigator.canShare?.({ files: [f] })) { await navigator.share({ files: [f], title: `Presenças — ${nome}` }); return; } } catch (e) { if (e?.name === 'AbortError') return; }
+    const a = document.createElement('a'); a.href = URL.createObjectURL(f); a.download = fn; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+    toast('Ficheiro descarregado. Envie-o para o PC (e-mail, WhatsApp, Drive…).');
+  };
+  $('#bLimpar').onclick = () => { if (!ev.lidos.length || confirm(`Apagar as ${ev.lidos.length} presenças lidas e começar de novo? Confirme primeiro que já as enviou para o PC.`)) { Guardar.apagar('evento'); pararCam?.(); ecraPresencas(); } };
+}
+
+/* ---------- Agenda do partido: cifrada; a chave vem no link do cartão ---------- */
+const b64d = s => Uint8Array.from(atob(String(s).replace(/-/g, '+').replace(/_/g, '/')), x => x.charCodeAt(0));
+const MESES = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
+const DIAS = ['domingo', 'segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado'];
+function ics(e) {
+  const x = t => String(t || '').replace(/\\/g, '\\\\').replace(/[,;]/g, m => '\\' + m).replace(/\r?\n/g, '\\n');
+  const d = e.data.replace(/-/g, ''), hm = t => t.replace(':', '') + '00';
+  let ini, fim;
+  if (e.hora) { ini = `DTSTART:${d}T${hm(e.hora)}`; let f = e.horaFim; if (!f) { const [h, m] = e.hora.split(':').map(Number); f = `${pad(Math.min(23, h + 2))}:${pad(m)}`; } fim = `DTEND:${d}T${hm(f)}`; }
+  else { const n = new Date(e.data); n.setDate(n.getDate() + 1); ini = `DTSTART;VALUE=DATE:${d}`; fim = `DTEND;VALUE=DATE:${n.getFullYear()}${pad(n.getMonth() + 1)}${pad(n.getDate())}`; }
+  const agora = new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d+/, '');
+  return ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//MPT//Cartao//PT', 'BEGIN:VEVENT', `UID:${x(e.id)}@cartao-mpt`, `DTSTAMP:${agora}`, ini, fim, `SUMMARY:${x(e.titulo)}`, ...(e.local ? [`LOCATION:${x(e.local)}`] : []), ...(e.desc ? [`DESCRIPTION:${x(e.desc)}`] : []), 'END:VEVENT', 'END:VCALENDAR'].join('\r\n') + '\r\n';
+}
+function desenharAgenda(a, aviso) {
+  const box = $('#agenda'); if (!box) return;
+  const h = hojeISO(), evs = (a?.eventos || []).filter(e => e && e.data >= h).sort((x, y) => `${x.data}${x.hora}`.localeCompare(`${y.data}${y.hora}`));
+  const vistos = new Set(Guardar.ler('vistos') || []);
+  box.innerHTML = `<div class="card agenda"><h2>📅 Agenda do partido</h2>${aviso ? `<p class="dica" style="margin:4px 0">${esc(aviso)}</p>` : ''}
+    ${evs.length ? evs.map(e => { const d = new Date(e.data + 'T12:00:00'); return `<div class="ev"><div class="ev-d"><small>${MESES[d.getMonth()]}</small><b>${d.getDate()}</b><small>${DIAS[d.getDay()].slice(0, 3)}</small></div>
+      <div class="ev-t"><b>${esc(e.titulo)}${vistos.has(e.id) ? '' : '<span class="novo">NOVO</span>'}</b><small>${esc([e.tipo, e.hora ? e.hora + (e.horaFim ? '–' + e.horaFim : '') : '', DIAS[d.getDay()]].filter(Boolean).join(' · '))}</small>${e.local ? `<small>${esc(e.local)}</small>` : ''}${e.desc ? `<p>${esc(e.desc)}</p>` : ''}
+      <div class="ev-a"><button data-ics="${esc(e.id)}">+ Calendário</button>${e.local ? `<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(e.local)}" target="_blank" rel="noopener">Mapa</a>` : ''}</div></div></div>`; }).join('')
+    : `<p class="vazio" style="padding:12px">${a ? 'Sem eventos marcados.' : 'A agenda ainda não está disponível.'}</p>`}</div>`;
+  box.querySelectorAll('[data-ics]').forEach(b => b.onclick = () => { const e = evs.find(x => x.id === b.dataset.ics); if (!e) return; const f = new File([ics(e)], `evento-${e.data}.ics`, { type: 'text/calendar' }); const l = document.createElement('a'); l.href = URL.createObjectURL(f); l.download = f.name; document.body.appendChild(l); l.click(); l.remove(); setTimeout(() => URL.revokeObjectURL(l.href), 4000); });
+  if (evs.length) Guardar.gravar('vistos', [...new Set([...vistos, ...evs.map(e => e.id)])].slice(-300));
+}
+async function abrirAgenda(c) {
+  if (!$('#agenda')) return;
+  if (!c.ak) { $('#agenda').innerHTML = '<p class="dica">Para ver a agenda do partido neste telemóvel, peça ao partido que lhe envie de novo o cartão digital.</p>'; return; }
+  const guardada = Guardar.ler('agenda'); desenharAgenda(guardada, guardada ? '' : 'A obter a agenda…');
+  let j;
+  try { const r = await fetch('agenda.json', { cache: 'no-store' }); if (r.status === 404) return desenharAgenda(guardada, ''); if (!r.ok) throw new Error(); j = await r.json(); }
+  catch { return desenharAgenda(guardada, guardada ? 'Sem internet: a mostrar a última agenda recebida.' : 'Sem internet: abra a aplicação com internet para receber a agenda.'); }
+  try {
+    const k = await crypto.subtle.importKey('raw', b64d(c.ak), 'AES-GCM', false, ['decrypt']);
+    const pt = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: b64d(j.iv), additionalData: new TextEncoder().encode('agenda-mpt') }, k, b64d(j.ct));
+    const a = JSON.parse(new TextDecoder().decode(pt)); Guardar.gravar('agenda', a); desenharAgenda(a, '');
+  } catch { desenharAgenda(guardada, 'Este cartão não consegue ler a agenda atual: peça ao partido um cartão digital novo.'); }
+}
+
+/* ---------- Arranque ---------- */
+const novo = lerLink();
+if (novo) ecraNovo(novo); else { if (location.hash) history.replaceState(null, '', location.pathname); ecraCartao(); }
+if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => { });
+</script>
+</body>
+</html>
